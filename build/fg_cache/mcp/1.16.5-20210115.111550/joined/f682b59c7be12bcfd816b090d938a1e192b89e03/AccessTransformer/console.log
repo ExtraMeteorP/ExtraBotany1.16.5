@@ -1,0 +1,5 @@
+JVM Args:    
+Run Args:    "--inJar", "D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\mcinject\output.jar", "--outJar", "D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\AccessTransformer\output.jar", "--atFile", "D:\MCModding\1165exbot\src\main\resources\META-INF\accesstransformer.cfg", "--atFile", "C:\Users\csh\AppData\Local\Temp\FG_ats_3145562286285583064.cfg"
+Classpath:   C:\Users\csh\.gradle\caches\forge_gradle\maven_downloader\net\minecraftforge\accesstransformers\1.0.5\accesstransformers-1.0.5-fatjar.jar
+Working Dir: D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\AccessTransformer
+Main Class:  net.minecraftforge.accesstransformer.TransformerProcessor
