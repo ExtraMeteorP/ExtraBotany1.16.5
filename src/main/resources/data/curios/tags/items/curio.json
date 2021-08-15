@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+	"extrabotany:aerostone",
+	"extrabotany:earthstone",
+	"extrabotany:aquastone",
+	"extrabotany:ignisstone",
+	"extrabotany:thecommunity"
+  ]
+}
