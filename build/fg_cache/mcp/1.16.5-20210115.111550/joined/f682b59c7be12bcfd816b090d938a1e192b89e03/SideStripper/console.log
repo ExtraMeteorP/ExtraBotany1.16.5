@@ -1,8 +1,0 @@
-JVM Args:    
-Run Args:    "--strip", "--input", "D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\AccessTransformer\output.jar", "--output", "D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\SideStripper\output.jar", "--data", "D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\SideStripper\string_data.sas"
-Classpath:   C:\Users\csh\.gradle\caches\forge_gradle\maven_downloader\net\minecraftforge\mergetool\1.0.7\mergetool-1.0.7-fatjar.jar
-Working Dir: D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\SideStripper
-Main Class:  net.minecraftforge.mergetool.ConsoleMerger
-Input:  D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\AccessTransformer\output.jar
-Output: D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\SideStripper\output.jar
-Data:   D:\MCModding\1165exbot\build\fg_cache\mcp\1.16.5-20210115.111550\joined\f682b59c7be12bcfd816b090d938a1e192b89e03\SideStripper\string_data.sas
