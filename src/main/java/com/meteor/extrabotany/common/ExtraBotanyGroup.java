@@ -1,9 +1,9 @@
 package com.meteor.extrabotany.common;
 
-import com.meteor.extrabotany.common.blocks.ModSubtiles;
 import com.meteor.extrabotany.common.items.ModItems;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import vazkii.botania.common.item.block.ItemBlockSpecialFlower;
 
 import static com.meteor.extrabotany.common.items.ModItems.*;
 import static com.meteor.extrabotany.common.blocks.ModSubtiles.*;
-import static com.meteor.extrabotany.common.items.ModItems.armor_shootingguardian_legs;
+import static com.meteor.extrabotany.common.blocks.ModBlocks.*;
 
 public final class ExtraBotanyGroup extends ItemGroup {
 
@@ -23,6 +23,7 @@ public final class ExtraBotanyGroup extends ItemGroup {
     public ExtraBotanyGroup() {
         super(LibMisc.MOD_ID);
         setNoTitle();
+        setBackgroundImageName("extrabotany.png");
     }
 
     @Override
@@ -49,6 +50,16 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addFlower(reikarlily, reikarlilyFloating);
         addFlower(tinkleflower, tinkleflowerFloating);
 
+        addBlock(powerframe);
+        addBlock(manabuffer);
+
+        addItem(lensmana);
+        addItem(lenspotion);
+        addItem(lenspush);
+        addItem(lenssmelt);
+        addItem(lenssupercondutor);
+        addItem(lenstrace);
+
         addItem(gildedpotato);
         addItem(gildedmashedpotato);
         addItem(nightmarefuel);
@@ -59,6 +70,9 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(aerialite);
         addItem(orichalcos);
         addItem(heromedal);
+        addItem(universalpetal);
+        addItem(elementrune);
+        addItem(sinrune);
         addItem(thechaos);
         addItem(theorigin);
         addItem(theend);
@@ -69,15 +83,34 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(aquastone);
         addItem(ignisstone);
         addItem(thecommunity);
+        addItem(peaceamulet);
+        addItem(powerglove);
+        addItem(froststar);
+        addItem(deathring);
+        addItem(manadrivering);
+        addItem(natureorb);
+        addItem(jingweifeather);
 
+        addItem(walkingcane);
+        addItem(shadowkatana);
+        addItem(influxwaver);
+        addItem(starwrath);
+        addItem(trueshadowkatana);
+        addItem(trueterrablade);
+        addItem(challengeticket);
         addItem(sagesmanaring);
         addItem(excaliber);
         addItem(failnaught);
+        addItem(camera);
+        addItem(coregod);
         addItem(motor);
+        addItem(motoraccessory);
+        addItem(cosmiccarkey);
+        addItem(cosmiccarkeyaccessory);
         addItem(gemofconquest);
         addItem(flamescionweapon);
-        addItem(cosmiccarkey);
         addItem(firstfractal);
+        addItem(buddhistrelics);
 
         addItem(armor_miku_helm);
         addItem(armor_miku_chest);
@@ -109,6 +142,11 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(mask);
         addItem(supercrown);
 
+        addItem(rewardbaga);
+        addItem(rewardbagb);
+        addItem(rewardbagc);
+        addItem(rewardbagd);
+
         addItem(emptybottle);
         addItem(manadrink);
         addItem(cocktail);
@@ -120,6 +158,10 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(new ItemBlockSpecialFlower(flower, defaultBuilder()));
         addItem(new ItemBlockSpecialFlower(floating, defaultBuilder()));
     }
+
+    private void addBlock(Block block){
+        new BlockItem(block, defaultBuilder()).fillItemGroup(this, list);
+    };
 
     private void addItem(Item item) {
         item.fillItemGroup(this, list);

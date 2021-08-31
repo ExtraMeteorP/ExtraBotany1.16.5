@@ -1,6 +1,8 @@
 package com.meteor.extrabotany.client.handler;
 
+import com.meteor.extrabotany.client.renderer.tile.RenderPowerFrame;
 import com.meteor.extrabotany.common.blocks.ModSubtiles;
+import com.meteor.extrabotany.common.blocks.tile.ModTiles;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -24,6 +26,8 @@ public class ModelHandler {
         ClientRegistry.bindTileEntityRenderer(ModSubtiles.REIKARLILY, RenderTileSpecialFlower::new);
         ClientRegistry.bindTileEntityRenderer(ModSubtiles.ANNOYING_FLOWER, RenderTileSpecialFlower::new);
         ClientRegistry.bindTileEntityRenderer(ModSubtiles.BLOODY_ENCHANTRESS, RenderTileSpecialFlower::new);
+
+        ClientRegistry.bindTileEntityRenderer(ModTiles.POWER_FRAME, RenderPowerFrame::new);
     }
 
     private ModelHandler() {}

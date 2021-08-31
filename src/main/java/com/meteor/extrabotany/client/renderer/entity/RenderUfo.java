@@ -1,7 +1,7 @@
 package com.meteor.extrabotany.client.renderer.entity;
 
 import com.meteor.extrabotany.client.model.ModelUfo;
-import com.meteor.extrabotany.common.entities.EntityUfo;
+import com.meteor.extrabotany.common.entities.mountable.EntityUfo;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;

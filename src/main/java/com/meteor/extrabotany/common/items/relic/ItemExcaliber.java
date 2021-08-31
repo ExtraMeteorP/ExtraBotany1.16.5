@@ -1,40 +1,21 @@
 package com.meteor.extrabotany.common.items.relic;
 
-import com.meteor.extrabotany.ExtraBotany;
-import com.meteor.extrabotany.common.network.ExcaliberLeftClickPack;
-import com.meteor.extrabotany.common.network.NetworkHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.ThrowableEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
-import net.minecraft.item.Rarity;
-import net.minecraft.item.SwordItem;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.internal.IManaBurst;
-import vazkii.botania.api.item.IRelic;
 import vazkii.botania.api.mana.BurstProperties;
 import vazkii.botania.api.mana.ILensEffect;
 import vazkii.botania.api.mana.IManaUsingItem;
-import vazkii.botania.common.advancements.RelicBindTrigger;
 import vazkii.botania.common.core.handler.ModSounds;
 import vazkii.botania.common.core.helper.ItemNBTHelper;
 import vazkii.botania.common.core.helper.Vector3;
@@ -42,37 +23,20 @@ import vazkii.botania.common.entity.EntityManaBurst;
 import vazkii.botania.common.item.equipment.tool.ToolCommons;
 import vazkii.botania.common.item.relic.ItemRelic;
 
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.UUID;
 
-public class ItemExcaliber extends SwordItem implements IRelic, IManaUsingItem, ILensEffect {
+public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILensEffect {
 
     private static final String TAG_ATTACKER_USERNAME = "attackerUsername";
     private static final String TAG_HOME_ID = "homeID";
-    private static final String TAG_SOULBIND_UUID = "soulbindUUID";
     private static final int MANA_PER_DAMAGE = 160;
 
     public ItemExcaliber(Properties prop) {
-        super(ItemTier.NETHERITE, 6, -2F, prop);
-        MinecraftForge.EVENT_BUS.register(this);
+        super(ItemTier.NETHERITE, 8, -2F, prop);
     }
 
-    @SubscribeEvent
-    public void leftClick(PlayerInteractEvent.LeftClickEmpty evt) {
-        if (!evt.getItemStack().isEmpty() && evt.getItemStack().getItem() == this) {
-            NetworkHandler.INSTANCE.sendToServer(new ExcaliberLeftClickPack());
-        }
-    }
-
-    @SubscribeEvent
-    public void attackEntity(AttackEntityEvent evt) {
-        if (!evt.getPlayer().world.isRemote) {
-            trySpawnBurst(evt.getPlayer());
-        }
-    }
-
-    public void trySpawnBurst(PlayerEntity player) {
+    @Override
+    public void onLeftClick(PlayerEntity player, Entity target) {
         if (!player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() == this
                 && player.getCooledAttackStrength(0) == 1) {
             EntityManaBurst burst = getBurst(player, player.getHeldItemMainhand());
@@ -81,88 +45,6 @@ public class ItemExcaliber extends SwordItem implements IRelic, IManaUsingItem, 
             player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), ModSounds.terraBlade,
                     SoundCategory.PLAYERS, 0.4F, 1.4F);
         }
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (!world.isRemote && entity instanceof PlayerEntity) {
-            updateRelic(stack, (PlayerEntity) entity);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void addInformation(final ItemStack stack, @Nullable World world, final List<ITextComponent> tooltip, ITooltipFlag flags) {
-        if (!hasUUID(stack)) {
-            tooltip.add(new TranslationTextComponent("botaniamisc.relicUnbound"));
-        } else {
-            if (!getSoulbindUUID(stack).equals(Minecraft.getInstance().player.getUniqueID())) {
-                tooltip.add(new TranslationTextComponent("botaniamisc.notYourSagittarius"));
-            } else {
-                tooltip.add(new TranslationTextComponent("botaniamisc.relicSoulbound", Minecraft.getInstance().player.getName()));
-            }
-        }
-    }
-
-    public boolean shouldDamageWrongPlayer() {
-        return true;
-    }
-
-    @Override
-    public int getEntityLifespan(ItemStack itemStack, World world) {
-        return Integer.MAX_VALUE;
-    }
-
-    public void updateRelic(ItemStack stack, PlayerEntity player) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof IRelic)) {
-            return;
-        }
-
-        boolean rightPlayer = true;
-
-        if (!hasUUID(stack)) {
-            bindToUUID(player.getUniqueID(), stack);
-            if (player instanceof ServerPlayerEntity) {
-                RelicBindTrigger.INSTANCE.trigger((ServerPlayerEntity) player, stack);
-            }
-        } else if (!getSoulbindUUID(stack).equals(player.getUniqueID())) {
-            rightPlayer = false;
-        }
-
-        if (!rightPlayer && player.ticksExisted % 10 == 0 && (!(stack.getItem() instanceof ItemRelic) || ((ItemRelic) stack.getItem()).shouldDamageWrongPlayer())) {
-            player.attackEntityFrom(damageSource(), 2);
-        }
-    }
-
-    public boolean isRightPlayer(PlayerEntity player, ItemStack stack) {
-        return hasUUID(stack) && getSoulbindUUID(stack).equals(player.getUniqueID());
-    }
-
-    public static DamageSource damageSource() {
-        return new DamageSource("botania-relic");
-    }
-
-    @Override
-    public void bindToUUID(UUID uuid, ItemStack stack) {
-        ItemNBTHelper.setString(stack, TAG_SOULBIND_UUID, uuid.toString());
-    }
-
-    @Override
-    public UUID getSoulbindUUID(ItemStack stack) {
-        if (ItemNBTHelper.verifyExistance(stack, TAG_SOULBIND_UUID)) {
-            try {
-                return UUID.fromString(ItemNBTHelper.getString(stack, TAG_SOULBIND_UUID, ""));
-            } catch (IllegalArgumentException ex) { // Bad UUID in tag
-                ItemNBTHelper.removeEntry(stack, TAG_SOULBIND_UUID);
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public boolean hasUUID(ItemStack stack) {
-        return getSoulbindUUID(stack) != null;
     }
 
     public static EntityManaBurst getBurst(PlayerEntity player, ItemStack stack) {

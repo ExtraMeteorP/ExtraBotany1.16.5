@@ -1,6 +1,6 @@
 package com.meteor.extrabotany.common.network;
 
-import com.meteor.extrabotany.common.entities.EntityUfo;
+import com.meteor.extrabotany.common.entities.mountable.EntityUfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;

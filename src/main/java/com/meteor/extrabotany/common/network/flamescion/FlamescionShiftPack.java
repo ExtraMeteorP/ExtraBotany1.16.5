@@ -1,6 +1,6 @@
 package com.meteor.extrabotany.common.network.flamescion;
 
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.meteor.extrabotany.common.handler.FlamescionHandler;
 import com.meteor.extrabotany.common.potions.ModPotions;
 import net.minecraft.entity.LivingEntity;

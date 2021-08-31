@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import javax.annotation.Nullable;
 
-public abstract class ItemBauble extends vazkii.botania.common.item.equipment.bauble.ItemBauble {
+public class ItemBauble extends vazkii.botania.common.item.equipment.bauble.ItemBauble {
 
     public ItemBauble(Properties props) {
         super(props);

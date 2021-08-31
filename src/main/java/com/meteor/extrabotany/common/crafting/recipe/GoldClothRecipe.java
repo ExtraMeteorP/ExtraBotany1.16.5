@@ -8,11 +8,8 @@ import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import vazkii.botania.api.item.IAncientWillContainer;
 import vazkii.botania.api.item.IRelic;
-import vazkii.botania.common.item.ItemAncientWill;
-
-import java.util.UUID;
+import vazkii.botania.common.core.helper.ItemNBTHelper;
 
 public class GoldClothRecipe extends SpecialRecipe {
 
@@ -58,9 +55,8 @@ public class GoldClothRecipe extends SpecialRecipe {
             }
         }
 
-        IRelic relic = (IRelic) item.getItem();
         ItemStack copy = item.copy();
-        relic.bindToUUID(UUID.fromString(""), copy);
+        ItemNBTHelper.removeEntry(copy, "soulbindUUID");
         return copy;
     }
 

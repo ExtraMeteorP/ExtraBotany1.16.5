@@ -1,6 +1,6 @@
 package com.meteor.extrabotany.client.model;
 
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.entity.model.EntityModel;

@@ -1,6 +1,6 @@
 package com.meteor.extrabotany.client.handler;
 
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.meteor.extrabotany.common.handler.FlamescionHandler;
 import com.meteor.extrabotany.common.handler.HerrscherHandler;
 import net.minecraft.client.Minecraft;

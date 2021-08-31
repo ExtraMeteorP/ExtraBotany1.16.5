@@ -1,5 +1,11 @@
 package com.meteor.extrabotany.common.entities;
 
+import com.meteor.extrabotany.common.entities.ego.EntityEGO;
+import com.meteor.extrabotany.common.entities.ego.EntityEGOLandmine;
+import com.meteor.extrabotany.common.entities.ego.EntityEGOMinion;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityUfo;
+import com.meteor.extrabotany.common.entities.projectile.*;
 import com.meteor.extrabotany.common.libs.LibEntityNames;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.entity.EntityClassification;
@@ -107,6 +113,62 @@ public class ModEntities {
             .setShouldReceiveVelocityUpdates(true)
             .build("");
 
+    public static final EntityType<EntityInfluxWaverProjectile> INFLUXWAVER = EntityType.Builder.<EntityInfluxWaverProjectile>create(
+            EntityInfluxWaverProjectile::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityTrueTerrabladeProjectile> TRUETERRABLADE = EntityType.Builder.<EntityTrueTerrabladeProjectile>create(
+            EntityTrueTerrabladeProjectile::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityTrueShadowKatanaProjectile> TRUESHADOWKATANA = EntityType.Builder.<EntityTrueShadowKatanaProjectile>create(
+            EntityTrueShadowKatanaProjectile::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityAuraFire> AURAFIRE = EntityType.Builder.<EntityAuraFire>create(
+            EntityAuraFire::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityEGO> EGO = EntityType.Builder.<EntityEGO>create(
+            EntityEGO::new, EntityClassification.CREATURE)
+            .size(0.6F, 1.8F)
+            .setUpdateInterval(2)
+            .setTrackingRange(128)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityEGOMinion> EGOMINION = EntityType.Builder.<EntityEGOMinion>create(
+            EntityEGOMinion::new, EntityClassification.CREATURE)
+            .size(0.6F, 1.8F)
+            .setUpdateInterval(2)
+            .setTrackingRange(128)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityEGOLandmine> EGOLANDMINE = EntityType.Builder.<EntityEGOLandmine>create(
+            EntityEGOLandmine::new, EntityClassification.MISC)
+            .size(3F, 0.1F)
+            .setUpdateInterval(2)
+            .setTrackingRange(128)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> evt) {
         IForgeRegistry<EntityType<?>> r = evt.getRegistry();
         register(r, LibEntityNames.KEYOFTRUTH, KEY_OF_TRUTH);
@@ -121,6 +183,15 @@ public class ModEntities {
         register(r, LibEntityNames.VOID, VOID);
         register(r, LibEntityNames.MAGICARROW, MAGICARROW);
         register(r, LibEntityNames.SPLASHGRENADE, SPLASHGRENADE);
+
+        register(r, LibEntityNames.EGO, EGO);
+        register(r, LibEntityNames.EGOMINION, EGOMINION);
+        register(r, LibEntityNames.EGOLANDMINE, EGOLANDMINE);
+
+        register(r, LibEntityNames.AURAFIRE, AURAFIRE);
+        register(r, LibEntityNames.INFLUXWAVER_PROJECTILE, INFLUXWAVER);
+        register(r, LibEntityNames.TRUETERRABLADE_PROJECTILE,TRUETERRABLADE);
+        register(r, LibEntityNames.TRUESHADOWKATANA_PROJECTILE, TRUESHADOWKATANA);
     }
 
     public static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, ResourceLocation name, IForgeRegistryEntry<V> thing) {

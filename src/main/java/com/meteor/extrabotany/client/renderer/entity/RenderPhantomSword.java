@@ -2,7 +2,7 @@ package com.meteor.extrabotany.client.renderer.entity;
 
 import com.meteor.extrabotany.client.handler.MiscellaneousIcons;
 import com.meteor.extrabotany.client.RenderHelper;
-import com.meteor.extrabotany.common.entities.EntityPhantomSword;
+import com.meteor.extrabotany.common.entities.projectile.EntityPhantomSword;
 import com.meteor.extrabotany.common.items.ModItems;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;

@@ -1,7 +1,7 @@
 package com.meteor.extrabotany.common.items;
 
 import com.meteor.extrabotany.ExtraBotany;
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -15,11 +15,12 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import vazkii.botania.common.item.relic.ItemRelic;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ItemMotor extends Item {
+public class ItemMotor extends ItemRelic {
 
     private static final Predicate<Entity> field_219989_a = EntityPredicates.NOT_SPECTATING.and(Entity::canBeCollidedWith);
 

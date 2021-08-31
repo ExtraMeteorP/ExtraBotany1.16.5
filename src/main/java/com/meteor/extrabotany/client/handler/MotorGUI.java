@@ -1,6 +1,6 @@
 package com.meteor.extrabotany.client.handler;
 
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;

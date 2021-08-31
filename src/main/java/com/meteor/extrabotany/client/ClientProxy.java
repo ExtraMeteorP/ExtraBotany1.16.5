@@ -3,9 +3,9 @@ package com.meteor.extrabotany.client;
 import com.meteor.extrabotany.ExtraBotany;
 import com.meteor.extrabotany.client.handler.*;
 import com.meteor.extrabotany.client.renderer.entity.*;
+import com.meteor.extrabotany.common.blocks.ModBlocks;
 import com.meteor.extrabotany.common.core.IProxy;
 import com.meteor.extrabotany.common.entities.ModEntities;
-import com.meteor.extrabotany.common.items.ModItems;
 import com.meteor.extrabotany.common.items.brew.ItemBrewBase;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.block.FlowerBlock;
@@ -49,7 +49,16 @@ public class ClientProxy implements IProxy {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.ULT, RenderFlamescionUlt::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.SWORD, RenderFlamescionSword::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.VOID, RenderFlamescionVoid::new);
+
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGO, RenderEGO::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGOMINION, RenderEGO::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGOLANDMINE, RenderEGOLandmine::new);
+
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.MAGICARROW, RenderDummy::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.AURAFIRE, RenderDummy::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.INFLUXWAVER, RenderProjectileBase::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.TRUETERRABLADE, RenderProjectileBase::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.TRUESHADOWKATANA, RenderProjectileBase::new);
 
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.SPLASHGRENADE, renderManager -> new SpriteRenderer<>(renderManager, Minecraft.getInstance().getItemRenderer()));
     }
@@ -84,6 +93,7 @@ public class ClientProxy implements IProxy {
     }
 
     private static void registerRenderTypes() {
+        RenderTypeLookup.setRenderLayer(ModBlocks.powerframe, RenderType.getCutout());
         Registry.BLOCK.stream().filter(b -> Registry.BLOCK.getKey(b).getNamespace().equals(LibMisc.MOD_ID))
                 .forEach(b -> {
                     if (b instanceof BlockFloatingFlower || b instanceof FlowerBlock

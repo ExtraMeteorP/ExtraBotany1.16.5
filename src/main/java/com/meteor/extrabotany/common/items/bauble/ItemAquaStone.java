@@ -13,7 +13,7 @@ public class ItemAquaStone extends ItemBauble{
 
     public ItemAquaStone(Properties props) {
         super(props);
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.addListener(this::manaDiscount);
     }
 
     @SubscribeEvent

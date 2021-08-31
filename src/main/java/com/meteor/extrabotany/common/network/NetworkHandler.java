@@ -46,18 +46,10 @@ public class NetworkHandler {
 
         INSTANCE.registerMessage(
                 nextID(),
-                MotorUpdatePack.class,
-                MotorUpdatePack::toBytes,
-                MotorUpdatePack::new,
-                MotorUpdatePack::handler
-        );
-
-        INSTANCE.registerMessage(
-                nextID(),
-                UfoUpdatePack.class,
-                UfoUpdatePack::toBytes,
-                UfoUpdatePack::new,
-                UfoUpdatePack::handler
+                MountableUpdatePack.class,
+                MountableUpdatePack::toBytes,
+                MountableUpdatePack::new,
+                MountableUpdatePack::handler
         );
 
         INSTANCE.registerMessage(
@@ -66,14 +58,6 @@ public class NetworkHandler {
                 UfoCatchPack::toBytes,
                 UfoCatchPack::new,
                 UfoCatchPack::handler
-        );
-
-        INSTANCE.registerMessage(
-                nextID(),
-                FractalLeftClickPack.class,
-                FractalLeftClickPack::toBytes,
-                FractalLeftClickPack::new,
-                FractalLeftClickPack::handler
         );
 
         INSTANCE.registerMessage(
@@ -110,18 +94,26 @@ public class NetworkHandler {
 
         INSTANCE.registerMessage(
                 nextID(),
-                FlamescionLeftClickPack.class,
-                FlamescionLeftClickPack::toBytes,
-                FlamescionLeftClickPack::new,
-                FlamescionLeftClickPack::handler
+                LeftClickPack.class,
+                LeftClickPack::toBytes,
+                LeftClickPack::new,
+                LeftClickPack::handler
         );
 
         INSTANCE.registerMessage(
                 nextID(),
-                ExcaliberLeftClickPack.class,
-                ExcaliberLeftClickPack::toBytes,
-                ExcaliberLeftClickPack::new,
-                ExcaliberLeftClickPack::handler
+                BuddhistChangePack.class,
+                BuddhistChangePack::toBytes,
+                BuddhistChangePack::new,
+                BuddhistChangePack::handler
+        );
+
+        INSTANCE.registerMessage(
+                nextID(),
+                MountPack.class,
+                MountPack::toBytes,
+                MountPack::new,
+                MountPack::handler
         );
     }
 

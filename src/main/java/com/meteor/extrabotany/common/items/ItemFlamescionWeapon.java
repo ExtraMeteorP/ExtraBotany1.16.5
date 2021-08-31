@@ -3,7 +3,7 @@ package com.meteor.extrabotany.common.items;
 import com.meteor.extrabotany.ExtraBotany;
 import com.meteor.extrabotany.common.entities.EntityFlamescionSword;
 import com.meteor.extrabotany.common.entities.EntityFlamescionVoid;
-import com.meteor.extrabotany.common.entities.EntityMotor;
+import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.meteor.extrabotany.common.entities.EntityStrengthenSlash;
 import com.meteor.extrabotany.common.handler.FlamescionHandler;
 import com.meteor.extrabotany.common.network.NetworkHandler;
