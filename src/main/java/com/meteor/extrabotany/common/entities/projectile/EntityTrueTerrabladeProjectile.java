@@ -50,16 +50,17 @@ public class EntityTrueTerrabladeProjectile extends EntityProjectileBase{
             Botania.proxy.addParticleForce(world, data, getPosX(), getPosY(), getPosZ(), 0, 0, 0);
         }
 
-        if (!world.isRemote) {
+        if (!world.isRemote && ticksExisted % 3 == 0) {
             AxisAlignedBB axis = new AxisAlignedBB(getPosX(), getPosY(), getPosZ(), lastTickPosX, lastTickPosY, lastTickPosZ).grow(2);
             List<LivingEntity> entities = world.getEntitiesWithinAABB(LivingEntity.class, axis);
             List<LivingEntity> list = DamageHandler.INSTANCE.getFilteredEntities(entities, getThrower());
             for (LivingEntity living : list) {
                 if(getThrower() instanceof PlayerEntity) {
-                    DamageHandler.INSTANCE.dmg(living, getThrower(), 10F, DamageHandler.INSTANCE.NETURAL);
+                    DamageHandler.INSTANCE.dmg(living, getThrower(), 11F, DamageHandler.INSTANCE.NETURAL);
                 }else{
-                    DamageHandler.INSTANCE.dmg(living, getThrower(), 0.05F, DamageHandler.INSTANCE.LIFE_LOSING);
-                    DamageHandler.INSTANCE.dmg(living, getThrower(), 6F, DamageHandler.INSTANCE.MAGIC);
+                    if(living.hurtResistantTime == 0)
+                        DamageHandler.INSTANCE.dmg(living, getThrower(), 2.5F, DamageHandler.INSTANCE.LIFE_LOSING);
+                    DamageHandler.INSTANCE.dmg(living, getThrower(), 7F, DamageHandler.INSTANCE.MAGIC);
                 }
             }
         }

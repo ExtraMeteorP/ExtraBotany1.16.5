@@ -1,6 +1,7 @@
 package com.meteor.extrabotany.common.network;
 
 import com.meteor.extrabotany.api.items.IMountableAccessory;
+import com.meteor.extrabotany.common.entities.mountable.EntityMountable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.entity.Entity;
@@ -35,7 +36,8 @@ public class MountPack {
                 ServerPlayerEntity player = ctx.get().getSender();
                 if(stack.getItem() instanceof IMountableAccessory){
                     IMountableAccessory mountable = (IMountableAccessory) stack.getItem();
-                    Entity mount = mountable.getMountableEntity(player.world);
+                    EntityMountable mount = (EntityMountable) mountable.getMountableEntity(player.world);
+                    mount.setOwnerId(player.getUniqueID());
                     mount.setPosition(player.getPosX(), player.getPosY()+0.5F, player.getPosZ());
                     mount.rotationYaw = player.rotationYaw;
                     if(player.world.addEntity(mount)){

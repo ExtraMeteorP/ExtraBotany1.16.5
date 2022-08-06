@@ -2,6 +2,7 @@ package com.meteor.extrabotany.common.items;
 
 import com.meteor.extrabotany.ExtraBotany;
 import com.meteor.extrabotany.api.items.WeightCategory;
+import com.meteor.extrabotany.common.core.ModSounds;
 import com.meteor.extrabotany.common.crafting.recipe.*;
 import com.meteor.extrabotany.common.items.armor.goblinslayer.ItemGoblinSlayerArmor;
 import com.meteor.extrabotany.common.items.armor.maid.ItemMaidArmor;
@@ -21,10 +22,7 @@ import com.meteor.extrabotany.common.items.relic.*;
 import com.meteor.extrabotany.common.libs.LibItemNames;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Food;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -33,6 +31,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import vazkii.botania.api.BotaniaAPI;
+import vazkii.botania.common.item.record.ItemModRecord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,11 +67,16 @@ public class ModItems {
             .effect(new EffectInstance(Effects.JUMP_BOOST, 1200, 0), 1.0F)
             .build();
     public static final Food FRIEDCHICKEN_PROP = (new Food.Builder()).hunger(6).saturation(0.5F).build();
+    public static final Food FRIGGA_APPLE_PROP = (new Food.Builder()).hunger(20).saturation(1.0F)
+            .setAlwaysEdible()
+            .effect(new EffectInstance(Effects.ABSORPTION, 2400, 4), 1.0F)
+            .build();
 
-    public static final Item spiritfuel = new Item(defaultBuilder().food(SPIRITFUEL_PROP));
+    public static final Item spiritfuel = new ItemSpiritFuel(defaultBuilder().food(SPIRITFUEL_PROP));
     public static final Item nightmarefuel = new ItemNightmareFuel(defaultBuilder().food(NIGHTMAREFUEL_PROP));
     public static final Item friedchicken = new Item(defaultBuilder().food(FRIEDCHICKEN_PROP));
     public static final Item gildedmashedpotato = new Item(defaultBuilder().food(GILDEDMASHEDPOTATO_PROP));
+    public static final Item friggaapple = new ItemFriggaApple(defaultBuilder().food(FRIGGA_APPLE_PROP));
 
     public static final Item motor = new ItemMotor();
     public static final Item gemofconquest = new ItemGemOfConquest();
@@ -81,7 +85,10 @@ public class ModItems {
     public static final Item flamescionweapon = new ItemFlamescionWeapon();
     public static final Item silverbullet = new ItemSilverBullet(unstackable());
     public static final Item walkingcane = new ItemWalkingCane(unstackable());
+    public static final Item manareader = new ItemManaReader(unstackable());
     public static final Item shadowkatana = new ItemShadowKatana(unstackable());
+    public static final Item rodofdiscord = new ItemRodOfDiscord(unstackable());
+    public static final Item uuzfan = new ItemUUZFan(unstackable());
 
     public static final Item peaceamulet = new ItemBauble(unstackable());
     public static final Item aerostone = new ItemAeroStone(unstackable());
@@ -108,6 +115,13 @@ public class ModItems {
     public static final Item buddhistrelics = new ItemBuddhistrelics(relic());
     public static final Item camera = new ItemCamera(relic());
     public static final Item coregod = new ItemCoreGod(relic());
+    public static final Item sunring = new ItemSunRing(relic());
+    public static final Item moonpendant = new ItemMoonPendant(relic());
+    public static final Item potatochips = new ItemPotatoChips(unstackable());
+    public static final Item spearsubspace = new ItemSpearSubspace(relic());
+    public static final Item judahoath = new ItemJudahOath(relic());
+    public static final Item judahoathkira = new ItemJudahOath(relic());
+    public static final Item judahoathsakura = new ItemJudahOath(relic());
 
     public static final Item spirit = new Item(defaultBuilder());
     public static final Item orichalcos = new Item(defaultBuilder());
@@ -116,7 +130,7 @@ public class ModItems {
     public static final Item shadowium = new Item(defaultBuilder());
     public static final Item goldcloth = new Item(defaultBuilder());
     public static final Item photonium = new Item(defaultBuilder());
-    public static final Item emptybottle = new Item(defaultBuilder());
+    public static final Item emptybottle = new ItemEmptyBottle(defaultBuilder());
     public static final Item aerialite = new Item(defaultBuilder());
     public static final Item thechaos = new Item(defaultBuilder());
     public static final Item theorigin = new Item(defaultBuilder());
@@ -159,6 +173,7 @@ public class ModItems {
     public static final Item rewardbagb = new ItemRewardBag(defaultBuilder(), categoryListB);
     public static final Item rewardbagc = new ItemRewardBag(defaultBuilder(), categoryListC);
     public static final Item rewardbagd = new ItemRewardBag(defaultBuilder(), categoryListD);
+    public static final Item rewardbaglimitededition = new ItemRewardBagLimitedEdition(defaultBuilder());
 
     public static final Item armor_maid_helm = new ItemMaidHelm(unstackable());
     public static final Item armor_maid_chest = new ItemMaidArmor(EquipmentSlotType.CHEST, unstackable());
@@ -185,6 +200,9 @@ public class ModItems {
     public static final Item armor_shootingguardian_legs = new ItemShootingGuardianArmor(EquipmentSlotType.LEGS, unstackable());
     public static final Item armor_shootingguardian_boots = new ItemShootingGuardianArmor(EquipmentSlotType.FEET, unstackable());
 
+    public static final Item recordego = new ItemModRecord(1, ModSounds.swordland, unstackable().rarity(Rarity.RARE));
+    public static final Item recordherrscher = new ItemModRecord(1, ModSounds.salvation, unstackable().rarity(Rarity.RARE));
+
     public static Item.Properties defaultBuilder() {
         return new Item.Properties().group(ExtraBotany.itemGroup);
     }
@@ -194,7 +212,7 @@ public class ModItems {
     }
 
     private static Item.Properties relic(){
-        return defaultBuilder().rarity(BotaniaAPI.instance().getRelicRarity()).setNoRepair();
+        return unstackable().rarity(BotaniaAPI.instance().getRelicRarity()).setNoRepair();
     };
 
     public static void registerItems(RegistryEvent.Register<Item> evt) {
@@ -203,6 +221,7 @@ public class ModItems {
         register(r, LibItemNames.NIGHTMAREFUEL, nightmarefuel);
         register(r, LibItemNames.GILDEDMASHEDPOTATO, gildedmashedpotato);
         register(r, LibItemNames.FRIEDCHICKEN, friedchicken);
+        register(r, LibItemNames.FRIGGAAPPLE, friggaapple);
 
         register(r, LibItemNames.CHALLENGETICKET, challengeticket);
 
@@ -213,7 +232,10 @@ public class ModItems {
         register(r, LibItemNames.FLAMESCIONWEAPON, flamescionweapon);
         register(r, LibItemNames.SILVERBULLET, silverbullet);
         register(r, LibItemNames.WALKINGCANE, walkingcane);
+        register(r, LibItemNames.MANAREADER, manareader);
         register(r, LibItemNames.SHADOWKATANA, shadowkatana);
+        register(r, LibItemNames.RODOFDISCORD, rodofdiscord);
+        register(r, LibItemNames.UUZFAN, uuzfan);
 
         register(r, LibItemNames.AEROSTONE, aerostone);
         register(r, LibItemNames.EARTHSTONE, earthstone);
@@ -240,6 +262,13 @@ public class ModItems {
         register(r, LibItemNames.CAMERA, camera);
         register(r, LibItemNames.BUDDHISTRELICS, buddhistrelics);
         register(r, LibItemNames.COREGOD, coregod);
+        register(r, LibItemNames.SUNRING, sunring);
+        register(r, LibItemNames.MOONPENDANT, moonpendant);
+        register(r, LibItemNames.POTATOCHIPS, potatochips);
+        register(r, LibItemNames.SPEARSUBSPACE, spearsubspace);
+        register(r, LibItemNames.JUDAHOATH, judahoath);
+        register(r, LibItemNames.JUDAHOATHKIRA, judahoathkira);
+        register(r, LibItemNames.JUDAHOATHSAKURA, judahoathsakura);
 
         register(r, LibItemNames.MANADRINK, manadrink);
         register(r, LibItemNames.BREW_COCKTAIL, cocktail);
@@ -304,6 +333,9 @@ public class ModItems {
         register(r, LibItemNames.ARMOR_SHOOTINGGUARDIAN_LEGS, armor_shootingguardian_legs);
         register(r, LibItemNames.ARMOR_SHOOTINGGUARDIAN_BOOTS, armor_shootingguardian_boots);
 
+        register(r, LibItemNames.RECORDEGO, recordego);
+        register(r, LibItemNames.RECORDHERRSCHER, recordherrscher);
+
         categoryListA.add(new WeightCategory(new ItemStack(universalpetal, 4), 10));
         categoryListA.add(new WeightCategory(new ItemStack(universalpetal, 8), 10));
         categoryListA.add(new WeightCategory(new ItemStack(universalpetal, 6), 30));
@@ -338,6 +370,7 @@ public class ModItems {
         register(r, LibItemNames.REWARDBAGB, rewardbagb);
         register(r, LibItemNames.REWARDBAGC, rewardbagc);
         register(r, LibItemNames.REWARDBAGD, rewardbagd);
+        register(r, LibItemNames.REWARDBAGLIMITIEDEDITION, rewardbaglimitededition);
     }
 
     public static void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> evt) {
@@ -350,6 +383,7 @@ public class ModItems {
         register(r, "lenspotion", LensPotionRecipe.SERIALIZER);
         register(r, "relicupgrade", RelicUpgradeRecipe.SERIALIZER);
         register(r, "relicupgradeshaped", RelicUpgradeShapedRecipe.SERIALIZER);
+        register(r, "silverbulletremovelens", SilverBulletRemoveLensRecipe.SERIALIZER);
     }
 
     public static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, ResourceLocation name, IForgeRegistryEntry<V> thing) {

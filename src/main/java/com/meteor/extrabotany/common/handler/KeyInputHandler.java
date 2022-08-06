@@ -2,11 +2,15 @@ package com.meteor.extrabotany.common.handler;
 
 import com.meteor.extrabotany.ExtraBotany;
 import com.meteor.extrabotany.api.items.IMountableAccessory;
+import com.meteor.extrabotany.client.ClientProxy;
 import com.meteor.extrabotany.common.entities.mountable.EntityMountable;
 import com.meteor.extrabotany.common.entities.mountable.EntityUfo;
 import com.meteor.extrabotany.common.items.relic.ItemBuddhistrelics;
 import com.meteor.extrabotany.common.items.ModItems;
 import com.meteor.extrabotany.common.network.*;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
@@ -27,6 +31,7 @@ import net.minecraftforge.fml.common.Mod;
 import vazkii.botania.common.core.handler.EquipmentHandler;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber
 public class KeyInputHandler {
@@ -60,17 +65,19 @@ public class KeyInputHandler {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
-        PlayerEntity p = Minecraft.getInstance().player;
-        if(p == null)
+        Minecraft mc = Minecraft.getInstance();
+        PlayerEntity p = mc.player;
+        Predicate<Screen> guiFilter = gui -> gui instanceof ContainerScreen || gui instanceof ChatScreen;
+        if(p == null || mc.world == null || guiFilter.test(mc.currentScreen))
             return;
-        if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_LEFT_CONTROL) {
+        if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == ClientProxy.BUDDHIST_SHIFT.getKey().getKeyCode()) {
             if (!ItemBuddhistrelics.relicShift(p.getHeldItemMainhand()).isEmpty()) {
                 NetworkHandler.INSTANCE.sendToServer(new BuddhistChangePack());
             }
         }
         Entity riding = p.getRidingEntity();
         if(riding == null){
-            if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_R) {
+            if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == ClientProxy.MOUNT_SUMMON.getKey().getKeyCode()) {
                 ItemStack mountable = EquipmentHandler.findOrEmpty((stack) -> stack.getItem() instanceof IMountableAccessory, p);
                 if (!mountable.isEmpty()) {
                     NetworkHandler.INSTANCE.sendToServer(new MountPack(mountable));
@@ -86,7 +93,7 @@ public class KeyInputHandler {
         if (riding instanceof EntityUfo) {
             EntityUfo steerable = (EntityUfo) riding;
 
-            if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_R){
+            if(event.getAction() == GLFW.GLFW_PRESS && event.getKey() == ClientProxy.UFO_CATCH.getKey().getKeyCode()){
 
                 if(steerable.getCatchedID() != -1){
                     steerable.setCatchedID(-1);

@@ -33,7 +33,7 @@ public class ItemDeathRing extends ItemBauble implements IManaUsingItem {
                             && entity.ticksExisted % 30 == 0) {
                         living.addPotionEffect(new EffectInstance(Effects.WITHER, 60, 1));
                         living.addPotionEffect(new EffectInstance(Effects.UNLUCK, 60, 1));
-                        DamageHandler.INSTANCE.dmg(living, entity, 0.5F, DamageHandler.INSTANCE.LIFE_LOSING);
+                        DamageHandler.INSTANCE.dmg(living, entity, 0.5F, DamageHandler.INSTANCE.MAGIC_PIERCING);
                     }
                 }
             }

@@ -1,10 +1,19 @@
 package com.meteor.extrabotany.common.items.relic;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.meteor.extrabotany.common.handler.DamageHandler;
+import com.meteor.extrabotany.common.handler.IAdvancementRequirement;
+import com.meteor.extrabotany.common.libs.LibAdvancementNames;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ThrowableEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.util.DamageSource;
@@ -23,9 +32,11 @@ import vazkii.botania.common.entity.EntityManaBurst;
 import vazkii.botania.common.item.equipment.tool.ToolCommons;
 import vazkii.botania.common.item.relic.ItemRelic;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.UUID;
 
-public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILensEffect {
+public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILensEffect, IAdvancementRequirement {
 
     private static final String TAG_ATTACKER_USERNAME = "attackerUsername";
     private static final String TAG_HOME_ID = "homeID";
@@ -45,6 +56,17 @@ public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILe
             player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), ModSounds.terraBlade,
                     SoundCategory.PLAYERS, 0.4F, 1.4F);
         }
+    }
+
+    @Nonnull
+    @Override
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot) {
+        Multimap<Attribute, AttributeModifier> ret = super.getAttributeModifiers(slot);
+        if (slot == EquipmentSlotType.MAINHAND) {
+            ret = HashMultimap.create(ret);
+            ret.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("995829fa-94c0-41bd-b046-0468c509a488"), "Excaliber modifier", 0.3D, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        }
+        return ret;
     }
 
     public static EntityManaBurst getBurst(PlayerEntity player, ItemStack stack) {
@@ -122,10 +144,7 @@ public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILe
                     float damage = BotaniaAPI.instance().getTerrasteelItemTier().getAttackDamage() + 3F;
                     if (!burst.isFake() && !entity.world.isRemote) {
                         PlayerEntity player = living.world.getPlayerByUuid(getSoulbindUUID(stack));
-                        living.attackEntityFrom(
-                                player == null ? ItemRelic.damageSource() : DamageSource.causePlayerDamage(player),
-                                damage);
-
+                        DamageHandler.INSTANCE.dmg(living, player, damage, DamageHandler.INSTANCE.NETURAL_PIERCING);
                         entity.remove();
                         break;
                     }
@@ -142,5 +161,10 @@ public class ItemExcaliber extends ItemSwordRelic implements IManaUsingItem, ILe
     @Override
     public boolean usesMana(ItemStack stack) {
         return true;
+    }
+
+    @Override
+    public String getAdvancementName() {
+        return LibAdvancementNames.EGODEFEAT;
     }
 }

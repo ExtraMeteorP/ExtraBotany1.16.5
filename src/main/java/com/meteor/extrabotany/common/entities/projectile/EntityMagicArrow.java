@@ -1,6 +1,7 @@
 package com.meteor.extrabotany.common.entities.projectile;
 
 import com.meteor.extrabotany.common.entities.ModEntities;
+import com.meteor.extrabotany.common.handler.DamageHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -62,29 +63,18 @@ public class EntityMagicArrow extends ThrowableEntity {
 
         PlayerEntity player = (PlayerEntity) thrower;
         if (!world.isRemote) {
-            AxisAlignedBB axis = new AxisAlignedBB(getPosX() - 2F, getPosY() - 2F, getPosZ() - 2F, lastTickPosX + 2F,
-                    lastTickPosY + 2F, lastTickPosZ + 2F);
+            AxisAlignedBB axis = new AxisAlignedBB(getPosX() - 3F, getPosY() - 3F, getPosZ() - 3F, lastTickPosX + 3F,
+                    lastTickPosY + 3F, lastTickPosZ + 3F);
             List<LivingEntity> entities = world.getEntitiesWithinAABB(LivingEntity.class, axis);
-            for (LivingEntity living : entities) {
-                if (living == thrower)
-                    continue;
-
-                if (living.hurtTime == 0) {
-                    attackedFrom(living, player, getDamage());
-                }
-
+            List<LivingEntity> livings = DamageHandler.INSTANCE.getFilteredEntities(entities, player);
+            for (LivingEntity living : livings) {
+                if(living.hurtResistantTime <= 5)
+                    DamageHandler.INSTANCE.dmg(living, player, getDamage(), DamageHandler.INSTANCE.NETURAL_PIERCING);
             }
         }
 
         if (ticksExisted > getLife())
             remove();
-    }
-
-    public static void attackedFrom(LivingEntity target, PlayerEntity player, float i) {
-        if (player != null)
-            target.attackEntityFrom(DamageSource.causePlayerDamage(player), i);
-        else
-            target.attackEntityFrom(DamageSource.GENERIC, i);
     }
 
     @Override
@@ -136,7 +126,12 @@ public class EntityMagicArrow extends ThrowableEntity {
     }
 
     @Override
-    public boolean isPushedByWater() {
+    public boolean isInWater() {
+        return false;
+    }
+
+    @Override
+    public boolean isPushedByWater(){
         return false;
     }
 

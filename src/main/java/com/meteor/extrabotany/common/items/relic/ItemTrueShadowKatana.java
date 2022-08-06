@@ -12,12 +12,15 @@ import net.minecraft.item.ItemTier;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import vazkii.botania.api.mana.ManaItemHandler;
 import vazkii.botania.common.core.helper.Vector3;
 
 import java.util.List;
 import java.util.Random;
 
 public class ItemTrueShadowKatana extends ItemSwordRelic {
+
+    public static final int MANA_PER_DAMAGE = 800;
 
     public ItemTrueShadowKatana(Properties prop) {
         super(ItemTier.DIAMOND, 5, -2F, prop);
@@ -26,20 +29,20 @@ public class ItemTrueShadowKatana extends ItemSwordRelic {
     public void attackEntity(LivingEntity player, Entity target){
         Vector3d targetpos = Vector3d.ZERO;
 
-        float RANGE = 8F;
+        float RANGE = 16F;
         AxisAlignedBB axis_ = new AxisAlignedBB(player.getPositionVec().add(-RANGE, -RANGE, -RANGE)
                 , player.getPositionVec().add(RANGE + 1, RANGE + 1, RANGE + 1));
 
         List<LivingEntity> entities = player.world.getEntitiesWithinAABB(LivingEntity.class, axis_);
         List<LivingEntity> list = DamageHandler.INSTANCE.getFilteredEntities(entities, player);
-        if(list.size() == 0) {
+        if(target != null || list.size() == 0) {
             targetpos = target == null ? Helper.PosToVec(raytraceFromEntity(player, 64F, true).getPos()).add(0, 1, 0) : target.getPositionVec().add(0, 1, 0);
-        }else if(player instanceof MobEntity && ((MobEntity)player).getAttackTarget() != null && entities.contains(((MobEntity)player).getAttackTarget())){
-            targetpos = ((MobEntity)player).getAttackTarget().getPositionVec();
-        }else if(player.getLastAttackedEntity() != null && entities.contains(player.getLastAttackedEntity())){
+        } else if(player.getLastAttackedEntity() != null && entities.contains(player.getLastAttackedEntity())){
             targetpos = player.getLastAttackedEntity().getPositionVec();
         }else {
             for(LivingEntity living : entities){
+                if(living == player)
+                    continue;
                 targetpos = living.getPositionVec();
                 break;
             }
@@ -82,7 +85,8 @@ public class ItemTrueShadowKatana extends ItemSwordRelic {
     @Override
     public void onLeftClick(PlayerEntity player, Entity target) {
         if (!player.world.isRemote && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() == this
-                && player.getCooledAttackStrength(0) == 1) {
+                && player.getCooledAttackStrength(0) == 1
+                && ManaItemHandler.instance().requestManaExactForTool(player.getHeldItemMainhand(), player, MANA_PER_DAMAGE, true)) {
             attackEntity(player, target);
         }
     }

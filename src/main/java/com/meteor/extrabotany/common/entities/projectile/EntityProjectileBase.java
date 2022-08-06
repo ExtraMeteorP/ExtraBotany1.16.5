@@ -204,6 +204,37 @@ public class EntityProjectileBase extends ThrowableEntity {
         dataManager.set(TARGET_POS_Z, f);
     }
 
+    @Override
+    public boolean canBeCollidedWith() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean isInWater(){
+        return false;
+    }
+
+    @Override
+    public boolean isPushedByWater(){
+        return false;
+    }
+
+    @Override
+    public boolean isImmuneToExplosions() {
+        return true;
+    }
+
+    @Override
+    public float getGravityVelocity() {
+        return 0F;
+    }
+
+
     @Nonnull
     @Override
     public IPacket<?> createSpawnPacket() {

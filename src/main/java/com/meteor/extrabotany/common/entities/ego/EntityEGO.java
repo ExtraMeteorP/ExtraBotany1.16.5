@@ -1,13 +1,17 @@
 package com.meteor.extrabotany.common.entities.ego;
 
 import com.google.common.collect.ImmutableList;
+import com.meteor.extrabotany.common.core.ConfigHandler;
+import com.meteor.extrabotany.common.core.ModSounds;
 import com.meteor.extrabotany.common.entities.ModEntities;
 import com.meteor.extrabotany.common.items.ModItems;
+import com.meteor.extrabotany.common.items.bauble.ItemNatureOrb;
 import com.meteor.extrabotany.common.items.relic.*;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.TickableSound;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -17,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTables;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
@@ -37,7 +42,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.BossInfo;
@@ -55,6 +59,8 @@ import vazkii.botania.client.fx.WispParticleData;
 import vazkii.botania.common.Botania;
 import vazkii.botania.common.block.ModBlocks;
 import vazkii.botania.common.core.helper.Vector3;
+import vazkii.botania.common.entity.EntityDoppleganger;
+import vazkii.botania.common.entity.EntityMagicLandmine;
 import vazkii.botania.common.lib.ModTags;
 import vazkii.botania.common.network.PacketBotaniaEffect;
 import vazkii.botania.common.network.PacketHandler;
@@ -65,9 +71,11 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.meteor.extrabotany.common.items.ModItems.prefix;
+
 public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
 
-    public static final float ARENA_RANGE = 15F;
+    public static final float ARENA_RANGE = 12F;
     public static final int ARENA_HEIGHT = 5;
 
     public static final float MAX_HP = 600F;
@@ -107,9 +115,10 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
     private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(ModEntities.EGO.getName(), BossInfo.Color.PINK, BossInfo.Overlay.PROGRESS).setCreateFog(true);;
     private UUID bossInfoUUID = bossInfo.getUniqueId();
     public PlayerEntity trueKiller = null;
-    private int MAX_WAVE = 5;
+    private int MAX_WAVE = 8;
     private int wave = 0;
-    private Integer[] waves = new Integer[]{0, 1, 2, 3, 4};
+    private int tpTimes = 0;
+    private Integer[] waves = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7};
 
     public EntityEGO(EntityType<EntityEGO> type, World world) {
         super(type, world);
@@ -121,6 +130,13 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
         if (!(world.getTileEntity(pos) instanceof BeaconTileEntity) ||
                 !isTruePlayer(player) ||
                 countEGOAround(world, pos) > 0) {
+            return false;
+        }
+
+        if(!checkInventory(player)){
+            if (!world.isRemote) {
+                player.sendMessage(new TranslationTextComponent("extrabotanymisc.inventoryUnfeasible").mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
+            }
             return false;
         }
 
@@ -159,9 +175,20 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
             return false;
         }
 
+        if(stack.getItem() == ModItems.natureorb){
+            ItemNatureOrb orb = (ItemNatureOrb) stack.getItem();
+            if(orb.getXP(stack) < 200000)
+                return false;
+        }
+
         //all checks ok, spawn the boss
         if (!world.isRemote) {
-            stack.shrink(1);
+
+            if(stack.getItem() == ModItems.natureorb){
+                ItemNatureOrb orb = (ItemNatureOrb) stack.getItem();
+                orb.setXP(stack, orb.getXP(stack) - 200000);
+            }else
+                stack.shrink(1);
 
             EntityEGO e = ModEntities.EGO.create(world);
             e.setPosition(pos.getX() + 0.5, pos.getY() + 3, pos.getZ() + 0.5);
@@ -175,6 +202,7 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
             e.getAttribute(Attributes.ARMOR).setBaseValue(20);
             e.getAttribute(Attributes.MAX_HEALTH).setBaseValue(MAX_HP * playerCount);
             e.playSound(SoundEvents.ENTITY_ENDER_DRAGON_GROWL, 10F, 0.1F);
+            e.setHealth(e.getMaxHealth());
             e.onInitialSpawn((ServerWorld) world, world.getDifficultyForLocation(e.getPosition()), SpawnReason.EVENT, null, null);
             world.addEntity(e);
         }
@@ -372,6 +400,11 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
                     teleportRandomly();
                 }
             }
+
+            if(getStage() == 2 && getHealth() - dmg <= getMaxHealth() * 0.05F){
+                setHealth(getMaxHealth() * 0.04F);
+                return false;
+            }
             return super.attackEntityFrom(source, dmg);
         }
 
@@ -395,9 +428,18 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
     public void onDeath(@Nonnull DamageSource source) {
         super.onDeath(source);
         LivingEntity entitylivingbase = getAttackingEntity();
-
+        if(!world.isRemote)
+            sendMessageToAll("extrabotany.ego.death_" + world.rand.nextInt(4));
         playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 20F, (1F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
         world.addParticle(ParticleTypes.EXPLOSION_EMITTER, getPosX(), getPosY(), getPosZ(), 1D, 0D, 0D);
+
+        for (EntityEGOLandmine landmine : world.getEntitiesWithinAABB(EntityEGOLandmine.class, getArenaBB(getSource()))) {
+            landmine.remove();
+        }
+
+        for (EntityEGOMinion minion : world.getEntitiesWithinAABB(EntityEGOMinion.class, getArenaBB(getSource()))) {
+            minion.remove();
+        }
     }
 
     @Override
@@ -434,19 +476,22 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
     }
 
     public List<PlayerEntity> getPlayersAround() {
-        float range = 15F;
-        return world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB(source.getX() + 0.5 - range, source.getY() + 0.5 - range, source.getZ() + 0.5 - range, source.getX() + 0.5 + range, source.getY() + 0.5 + range, source.getZ() + 0.5 + range), player -> isTruePlayer(player) && !player.isSpectator());
+        return world.getEntitiesWithinAABB(PlayerEntity.class, getArenaBB(source), player -> isTruePlayer(player) && !player.isSpectator());
     }
 
     private static int countEGOAround(World world, BlockPos source) {
-        float range = 15F;
-        List<EntityEGO> l = world.getEntitiesWithinAABB(EntityEGO.class, new AxisAlignedBB(source.getX() + 0.5 - range, source.getY() + 0.5 - range, source.getZ() + 0.5 - range, source.getX() + 0.5 + range, source.getY() + 0.5 + range, source.getZ() + 0.5 + range));
+        List<EntityEGO> l = world.getEntitiesWithinAABB(EntityEGO.class, getArenaBB(source));
         return l.size();
     }
 
+    @Nonnull
+    private static AxisAlignedBB getArenaBB(@Nonnull BlockPos source) {
+        double range = ARENA_RANGE + 3D;
+        return new AxisAlignedBB(source.getX() + 0.5 - range, source.getY() + 0.5 - range, source.getZ() + 0.5 - range, source.getX() + 0.5 + range, source.getY() + 0.5 + range, source.getZ() + 0.5 + range);
+    }
+
     private static int countEGOMinionAround(World world, BlockPos source) {
-        float range = 15F;
-        List<EntityEGOMinion> l = world.getEntitiesWithinAABB(EntityEGOMinion.class, new AxisAlignedBB(source.getX() + 0.5 - range, source.getY() + 0.5 - range, source.getZ() + 0.5 - range, source.getX() + 0.5 + range, source.getY() + 0.5 + range, source.getZ() + 0.5 + range));
+        List<EntityEGOMinion> l = world.getEntitiesWithinAABB(EntityEGOMinion.class, getArenaBB(source));
         return l.size();
     }
 
@@ -511,6 +556,11 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
 
             player.setMotion(motion.x, 0.2, motion.z);
             player.velocityChanged = true;
+
+            if(player.getRidingEntity() != null){
+                player.getRidingEntity().setMotion(motion.x, 0.2, motion.z);
+                player.getRidingEntity().velocityChanged = true;
+            }
         }
     }
 
@@ -557,6 +607,51 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
         }
     }
 
+    public static boolean checkFeasibility(ItemStack stack){
+        if(stack.isEmpty())
+            return true;
+
+        String modid = stack.getItem().getRegistryName().getNamespace();
+        if(modid.contains("extrabotany") || modid.contains("botania") || modid.contains("minecraft")){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean checkInventory(PlayerEntity player){
+        if (player.isCreative() || ConfigHandler.COMMON.disableDisarm.get()) {
+            return true;
+        }
+        for(int i = 0; i < player.inventory.getInventoryStackLimit(); i++){
+            final ItemStack stack = player.inventory.getStackInSlot(i);
+            if(!checkFeasibility(stack))
+                return false;
+        }
+        return true;
+    }
+
+    public static void disarm(PlayerEntity player){
+        if (!ConfigHandler.COMMON.disableDisarm.get() && !player.isCreative()) {
+            for(int i = 0; i < player.inventory.getInventoryStackLimit(); i++){
+                final ItemStack stack = player.inventory.getStackInSlot(i);
+                if(!checkFeasibility(stack)){
+                    player.dropItem(stack, false);
+                    player.inventory.setInventorySlotContents(i, ItemStack.EMPTY);
+                }
+            }
+        }
+    }
+
+    public void unlegalPlayercount(){
+        if(getPlayersAround().size() > playerCount){
+            for(PlayerEntity player : getPlayersAround())
+                if (!world.isRemote) {
+                    player.sendMessage(new TranslationTextComponent("extrabotanymisc.unlegalPlayercount").mergeStyle(TextFormatting.RED), Util.DUMMY_UUID);
+                }
+            remove();
+        }
+    }
+
     public boolean tryAttack(){
         if(getPlayersAround().isEmpty())
             return false;
@@ -599,15 +694,6 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
 
         List<Integer> WAVES = Arrays.asList(waves);
 
-        if(attackDelay > 0){
-            attackDelay--;
-        }else{
-            if(tryAttack()){
-                int delay = (int) (80 - getStage() * 15 + 15 * Math.random());
-                attackDelay = delay;
-            }
-        }
-
         if (world.isRemote) {
             particles();
             PlayerEntity player = Botania.proxy.getClientPlayer();
@@ -627,9 +713,14 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
             remove();
         }
 
+        for(PlayerEntity player : getPlayersAround())
+            disarm(player);
+
+        unlegalPlayercount();
+
         if(invul > 0){
             setInvulTime(invul - 1);
-            if(getStage() == 1){
+            if(getStage() == 1 || getStage() == 3){
                 if(invul >= 20){
                     setMotion(getMotion().getX(), 0, getMotion().getZ());
                     if(invul % 60 == 0)
@@ -639,8 +730,8 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
                         }
                     return;
                 }
-
             }
+
             if(getStage() == 2){
                 if(invul >= 20){
                     setMotion(getMotion().getX(), 0, getMotion().getZ());
@@ -649,6 +740,15 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
                         setInvulTime(0);
                     return;
                 }
+            }
+        }
+
+        if(attackDelay > 0){
+            attackDelay--;
+        }else{
+            if(tryAttack()){
+                int delay = (int) (80 - getStage() * 15 + 15 * Math.random());
+                attackDelay = delay;
             }
         }
 
@@ -678,7 +778,7 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
         if(changeWeaponDelay > 0){
             changeWeaponDelay--;
         }else{
-            changeWeaponDelay = 160;
+            changeWeaponDelay = 100;
             int weaponType = getStage() == 0 ? world.rand.nextInt(2) : getStage() == 1 ? world.rand.nextInt(4) : 4;
             setWeaponType(weaponType);
         }
@@ -688,24 +788,92 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
         }else{
             if(tryAttack()) {
                 teleportRandomly();
+                tpTimes++;
                 tpDelay = 100 - getStage() * 10;
             }
         }
 
+//        if(getStage() >= 1 && tpTimes % 7 == 0){
+//            EntityEGOLandmine.spawnLandmine(world.rand.nextInt(8), world, source, this);
+//            tpTimes++;
+//        }
+
         if(getStage() == 0 && getHealth() < 0.75F * getMaxHealth()) {
             setStage(1);
-            setInvulTime(300);
+            setInvulTime(460);
             Collections.shuffle(WAVES);
             this.setPositionAndUpdate(source.getX()+0.5, source.getY()+3, source.getZ()+0.5);
+            EntityEGOBeam beam = new EntityEGOBeam(world);
+            beam.setPosition(source.getX()+0.5, source.getY(), source.getZ()+0.5);
+            beam.summoner = this;
+            beam.setColor(1F, 1F, 1F);
+            beam.setSpeedModifier(1.6F);
+            beam.setBeamDamage(11F);
+            world.addEntity(beam);
+            sendMessageToAll("extrabotany.ego.stage0_" + world.rand.nextInt(4));
         }
+
         if(getStage() == 1 && getHealth() < 0.25F * getMaxHealth()){
             setStage(2);
             setInvulTime(600);
             setWeaponType(4);
-            EntityEGOMinion.spawn(world, getSource(), 60F * playerCount);
+            EntityEGOMinion.spawn(this, world, getSource(), 60F * playerCount);
+            this.setPositionAndUpdate(source.getX()+0.5, source.getY()+3, source.getZ()+0.5);
+            sendMessageToAll("extrabotany.ego.stage1_" + world.rand.nextInt(4));
+        }
+
+        if(getStage() == 2 && getHealth() <= 0.05F * getMaxHealth()){
+            wave = 0;
+            setStage(3);
+            setInvulTime(460);
+            sendMessageToAll("extrabotany.ego.stage2_" + world.rand.nextInt(4));
+
+            EntityEGOBeam beam = new EntityEGOBeam(world);
+            beam.setPosition(source.getX() + 0.5, source.getY(), source.getZ() + 0.5);
+            beam.summoner = this;
+            beam.setColor(1F, 1F, 1F);
+            beam.setSpeedModifier(1.8F);
+            beam.setBeamDamage(11F);
+            world.addEntity(beam);
+
+            Vector3d vec = new Vector3d(6D, 0, 0);
+
+            EntityEGOBeam beamRed = new EntityEGOBeam(world);
+            beamRed.setPosition(source.getX() + 0.5 + vec.x, source.getY(), source.getZ() + 0.5 + vec.z);
+            beamRed.summoner = this;
+            beamRed.setColor(0.8F, 0.1F, 0.1F);
+            beamRed.setSpeedModifier(1.2F);
+            beamRed.setBeamDamage(17F);
+            world.addEntity(beamRed);
+            vec.rotateYaw((float) (Math.PI * 2 / 3));
+
+            EntityEGOBeam beamGreen = new EntityEGOBeam(world);
+            beamGreen.setPosition(source.getX() + 0.5 + vec.x, source.getY(), source.getZ() + 0.5 + vec.z);
+            beamGreen.summoner = this;
+            beamGreen.setColor(0.1F, 0.8F, 0.1F);
+            beamGreen.setSpeedModifier(1.5F);
+            beamGreen.setBeamDamage(13F);
+            world.addEntity(beamGreen);
+            vec.rotateYaw((float) (Math.PI * 2 / 3));
+
+            EntityEGOBeam beamBlue = new EntityEGOBeam(world);
+            beamBlue.setPosition(source.getX() + 0.5 + vec.x, source.getY(), source.getZ() + 0.5 + vec.z);
+            beamBlue.summoner = this;
+            beamBlue.setColor(0.1F, 0.1F, 0.8F);
+            beamBlue.setSpeedModifier(2.1F);
+            beamBlue.setBeamDamage(8F);
+            world.addEntity(beamBlue);
+            vec.rotateYaw((float) (Math.PI * 2 / 3));
+
             this.setPositionAndUpdate(source.getX()+0.5, source.getY()+3, source.getZ()+0.5);
         }
 
+    }
+
+    public void sendMessageToAll(String text){
+        for(PlayerEntity player : getPlayersAround()){
+            player.sendMessage(new TranslationTextComponent(text, getCustomName()), getUniqueID());
+        }
     }
 
     @Override
@@ -716,6 +884,14 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
     @Override
     public boolean isNonBoss() {
         return false;
+    }
+
+    @Override
+    public ResourceLocation getLootTable() {
+        if (getStage() < 2) {
+            return LootTables.EMPTY;
+        }
+        return prefix("ego");
     }
 
     @Override
@@ -870,6 +1046,7 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
         long msb = additionalData.readLong();
         long lsb = additionalData.readLong();
         bossInfoUUID = new UUID(msb, lsb);
+        Minecraft.getInstance().getSoundHandler().play(new EntityEGO.EgoMusic(this));
     }
 
     @Nonnull
@@ -882,4 +1059,26 @@ public class EntityEGO extends MobEntity implements IEntityAdditionalSpawnData {
     public boolean canBeLeashedTo(PlayerEntity player) {
         return false;
     }
+
+    @OnlyIn(Dist.CLIENT)
+    private static class EgoMusic extends TickableSound {
+        private final EntityEGO guardian;
+
+        public EgoMusic(EntityEGO guardian) {
+            super(ModSounds.swordland, SoundCategory.RECORDS);
+            this.guardian = guardian;
+            this.x = guardian.getSource().getX();
+            this.y = guardian.getSource().getY();
+            this.z = guardian.getSource().getZ();
+            // this.repeat = true; TODO restore once LWJGL3/vanilla bug fixed?
+        }
+
+        @Override
+        public void tick() {
+            if (!guardian.isAlive()) {
+                finishPlaying();
+            }
+        }
+    }
+
 }

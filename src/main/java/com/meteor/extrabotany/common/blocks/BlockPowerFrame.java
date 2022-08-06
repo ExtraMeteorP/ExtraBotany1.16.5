@@ -1,6 +1,7 @@
 package com.meteor.extrabotany.common.blocks;
 
 import com.meteor.extrabotany.common.blocks.tile.TilePowerFrame;
+import com.meteor.extrabotany.common.items.ModItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,8 +16,10 @@ import net.minecraft.world.World;
 import vazkii.botania.api.internal.VanillaPacketDispatcher;
 import vazkii.botania.api.mana.IManaItem;
 import vazkii.botania.common.block.BlockMod;
+import vazkii.botania.common.block.tile.TileSimpleInventory;
 import vazkii.botania.common.core.helper.InventoryHelper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockPowerFrame extends BlockMod implements ITileEntityProvider {
@@ -38,7 +41,7 @@ public class BlockPowerFrame extends BlockMod implements ITileEntityProvider {
             InventoryHelper.withdrawFromInventory(frame, player);
             VanillaPacketDispatcher.dispatchTEToNearbyPlayers(frame);
             return ActionResultType.SUCCESS;
-        }else if(!stack.isEmpty() && stack.getItem() instanceof IManaItem){
+        }else if(!stack.isEmpty() && stack.getItem() instanceof IManaItem || stack.getItem() == ModItems.natureorb){
             boolean result = frame.addItem(player, stack, hand);
             VanillaPacketDispatcher.dispatchTEToNearbyPlayers(frame);
             return result ? ActionResultType.SUCCESS : ActionResultType.PASS;
@@ -53,4 +56,16 @@ public class BlockPowerFrame extends BlockMod implements ITileEntityProvider {
     public TileEntity createNewTileEntity(IBlockReader iBlockReader) {
         return new TilePowerFrame();
     }
+
+    @Override
+    public void onReplaced(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        if (state.getBlock() != newState.getBlock()) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileSimpleInventory) {
+                net.minecraft.inventory.InventoryHelper.dropInventoryItems(world, pos, ((TileSimpleInventory) te).getItemHandler());
+            }
+            super.onReplaced(state, world, pos, newState, isMoving);
+        }
+    }
+
 }

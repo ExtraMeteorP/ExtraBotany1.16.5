@@ -1,6 +1,8 @@
 package com.meteor.extrabotany.common.items.bauble;
 
 import com.meteor.extrabotany.client.handler.MiscellaneousIcons;
+import com.meteor.extrabotany.common.handler.IAdvancementRequirement;
+import com.meteor.extrabotany.common.libs.LibAdvancementNames;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -14,8 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -31,7 +31,6 @@ import vazkii.botania.api.mana.ManaItemHandler;
 import vazkii.botania.client.fx.SparkleParticleData;
 import vazkii.botania.common.core.handler.EquipmentHandler;
 import vazkii.botania.common.core.helper.ItemNBTHelper;
-import vazkii.botania.common.item.ModItems;
 import vazkii.botania.common.item.relic.ItemRelicBauble;
 
 import javax.annotation.Nonnull;
@@ -39,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ItemCoreGod extends ItemRelicBauble implements IManaUsingItem {
+public class ItemCoreGod extends ItemRelicBauble implements IManaUsingItem, IAdvancementRequirement {
 
     private static final String TAG_VARIANT = "variant";
 
@@ -179,11 +178,10 @@ public class ItemCoreGod extends ItemRelicBauble implements IManaUsingItem {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void renderHerrscher(BipedModel<?> bipedModel, IBakedModel model, ItemStack stack, MatrixStack ms, IRenderTypeBuffer buffers, float flap) {
+    public static void renderHerrscher(BipedModel<?> bipedModel, IBakedModel model, ItemStack stack, MatrixStack ms, IRenderTypeBuffer buffers, float flap) {
         ms.push();
         bipedModel.bipedBody.translateRotate(ms);
         ms.translate(0, -0.2, 0.3);
-
 
         for(int i = 0; i < 3; i++) {
             ms.push();
@@ -206,6 +204,12 @@ public class ItemCoreGod extends ItemRelicBauble implements IManaUsingItem {
         Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE, false, ms, buffers, 0xF000F0, OverlayTexture.NO_OVERLAY, model);
         ms.pop();
 
+        ms.pop();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static void renderStarlight(BipedModel<?> bipedModel, IBakedModel model, ItemStack stack, MatrixStack ms, IRenderTypeBuffer buffers, int light, float flap) {
+        ms.push();
 
         ms.pop();
     }
@@ -264,6 +268,11 @@ public class ItemCoreGod extends ItemRelicBauble implements IManaUsingItem {
 
     public static int getVariant(ItemStack stack) {
         return ItemNBTHelper.getInt(stack, TAG_VARIANT, 0);
+    }
+
+    @Override
+    public String getAdvancementName() {
+        return LibAdvancementNames.EGODEFEAT;
     }
 
 }

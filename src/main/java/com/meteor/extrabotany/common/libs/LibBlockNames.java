@@ -7,6 +7,7 @@ public class LibBlockNames {
     public static final String POWER_FRAME = "powerframe";
     public static final String TERRA_ALTAR = "terraaltar";
     public static final String MANA_BUFFER = "manabuffer";
+    public static final String DIMENSION_CATALYST = "dimensioncatalyst";
 
     public static final ResourceLocation GENERATING_BELLFLOWER = new ResourceLocation(LibMisc.MOD_ID, "bellflower");
     public static final ResourceLocation GENERATING_MOONBLESS = new ResourceLocation(LibMisc.MOD_ID,"moonbless");
@@ -19,4 +20,5 @@ public class LibBlockNames {
     public static final ResourceLocation GENERATING_BLOODYENCHANTRESS = new ResourceLocation(LibMisc.MOD_ID,"bloodyenchantress");
 
     public static final ResourceLocation FUNCTIONAL_ANNOYINGFLOWER = new ResourceLocation(LibMisc.MOD_ID, "annoyingflower");
+    public static final ResourceLocation FUNCTIONAL_SERENITIAN = new ResourceLocation(LibMisc.MOD_ID, "serenitian");
 }

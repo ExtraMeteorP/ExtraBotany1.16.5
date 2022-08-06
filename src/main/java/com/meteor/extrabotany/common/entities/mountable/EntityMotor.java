@@ -14,6 +14,7 @@ import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
@@ -26,8 +27,12 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
+import vazkii.botania.common.core.helper.ItemNBTHelper;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class EntityMotor extends EntityMountable {
 
@@ -93,6 +98,13 @@ public class EntityMotor extends EntityMountable {
     @Override
     public Item getItemBoat() {
         return ModItems.motor;
+    }
+
+    @Override
+    public ItemStack getItemStack(){
+        ItemStack motor = new ItemStack(getItemBoat());
+        ItemNBTHelper.setString(motor, "soulbindUUID", getOwnerId().toString());
+        return getMountable() ? ItemStack.EMPTY : motor;
     }
 
     @Override

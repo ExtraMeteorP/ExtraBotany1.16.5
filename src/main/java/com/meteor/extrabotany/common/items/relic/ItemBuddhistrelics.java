@@ -1,6 +1,8 @@
 package com.meteor.extrabotany.common.items.relic;
 
+import com.meteor.extrabotany.common.handler.IAdvancementRequirement;
 import com.meteor.extrabotany.common.items.ModItems;
+import com.meteor.extrabotany.common.libs.LibAdvancementNames;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -10,11 +12,12 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemStackHandler;
+import vazkii.botania.api.item.IRelic;
 import vazkii.botania.api.mana.ManaItemHandler;
 import vazkii.botania.common.core.helper.ItemNBTHelper;
 import vazkii.botania.common.item.relic.ItemRelic;
 
-public class ItemBuddhistrelics extends ItemRelic {
+public class ItemBuddhistrelics extends ItemRelic implements IAdvancementRequirement {
 
     public static final String TAG_MORPHING = "buddhist:morphing";
     public static final String TAG_DATA = "buddhist:data";
@@ -32,13 +35,15 @@ public class ItemBuddhistrelics extends ItemRelic {
             final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             for(int i = 0; i < player.inventory.getInventoryStackLimit(); i++){
                 final ItemStack stack = player.inventory.getStackInSlot(i);
-                if(ItemNBTHelper.getBoolean(stack, TAG_MORPHING, false)){
-                    if(ManaItemHandler.instance().requestManaExact(stack, player, MANA_PER_DAMAGE, false)){
-                        ManaItemHandler.instance().requestManaExact(stack, player, MANA_PER_DAMAGE, true);
-                    }else{
-                        ItemStack budd = expired(stack);
-                        if(!budd.isEmpty()){
-                            player.inventory.setInventorySlotContents(i, budd);
+                if(stack.getItem() instanceof IRelic) {
+                    if (ItemNBTHelper.getBoolean(stack, TAG_MORPHING, false)) {
+                        if (ManaItemHandler.instance().requestManaExact(stack, player, MANA_PER_DAMAGE, false)) {
+                            ManaItemHandler.instance().requestManaExact(stack, player, MANA_PER_DAMAGE, true);
+                        } else {
+                            ItemStack budd = expired(stack);
+                            if (!budd.isEmpty()) {
+                                player.inventory.setInventorySlotContents(i, budd);
+                            }
                         }
                     }
                 }
@@ -128,4 +133,8 @@ public class ItemBuddhistrelics extends ItemRelic {
         return ItemStack.EMPTY;
     }
 
+    @Override
+    public String getAdvancementName() {
+        return LibAdvancementNames.EGODEFEAT;
+    }
 }

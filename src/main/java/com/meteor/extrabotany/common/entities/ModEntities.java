@@ -1,12 +1,15 @@
 package com.meteor.extrabotany.common.entities;
 
 import com.meteor.extrabotany.common.entities.ego.EntityEGO;
+import com.meteor.extrabotany.common.entities.ego.EntityEGOBeam;
 import com.meteor.extrabotany.common.entities.ego.EntityEGOLandmine;
 import com.meteor.extrabotany.common.entities.ego.EntityEGOMinion;
+import com.meteor.extrabotany.common.entities.herrscher.EntityHerrscher;
 import com.meteor.extrabotany.common.entities.mountable.EntityMotor;
 import com.meteor.extrabotany.common.entities.mountable.EntityUfo;
 import com.meteor.extrabotany.common.entities.projectile.*;
 import com.meteor.extrabotany.common.libs.LibEntityNames;
+import com.meteor.extrabotany.common.libs.LibItemNames;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -100,7 +103,7 @@ public class ModEntities {
     public static final EntityType<EntityMagicArrow> MAGICARROW = EntityType.Builder.<EntityMagicArrow>create(
             EntityMagicArrow::new, EntityClassification.MISC)
             .size(0.05F, 0.05F)
-            .setUpdateInterval(10)
+            .setUpdateInterval(5)
             .setTrackingRange(64)
             .setShouldReceiveVelocityUpdates(true)
             .build("");
@@ -145,6 +148,14 @@ public class ModEntities {
             .setShouldReceiveVelocityUpdates(true)
             .build("");
 
+    public static final EntityType<EntityJudahOath> JUDAHOATH = EntityType.Builder.<EntityJudahOath>create(
+            EntityJudahOath::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
     public static final EntityType<EntityEGO> EGO = EntityType.Builder.<EntityEGO>create(
             EntityEGO::new, EntityClassification.CREATURE)
             .size(0.6F, 1.8F)
@@ -169,6 +180,30 @@ public class ModEntities {
             .setShouldReceiveVelocityUpdates(true)
             .build("");
 
+    public static final EntityType<EntityButterflyProjectile> BUTTERFLY = EntityType.Builder.<EntityButterflyProjectile>create(
+            EntityButterflyProjectile::new, EntityClassification.MISC)
+            .size(0.1F, 0.1F)
+            .setUpdateInterval(10)
+            .setTrackingRange(64)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityEGOBeam> EGOBEAM = EntityType.Builder.<EntityEGOBeam>create(
+            EntityEGOBeam::new, EntityClassification.MISC)
+            .size(0.5F, 2F)
+            .setUpdateInterval(2)
+            .setTrackingRange(128)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
+    public static final EntityType<EntityHerrscher> HERRSCHER = EntityType.Builder.<EntityHerrscher>create(
+            EntityHerrscher::new, EntityClassification.CREATURE)
+            .size(0.6F, 1.8F)
+            .setUpdateInterval(2)
+            .setTrackingRange(128)
+            .setShouldReceiveVelocityUpdates(true)
+            .build("");
+
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> evt) {
         IForgeRegistry<EntityType<?>> r = evt.getRegistry();
         register(r, LibEntityNames.KEYOFTRUTH, KEY_OF_TRUTH);
@@ -187,11 +222,16 @@ public class ModEntities {
         register(r, LibEntityNames.EGO, EGO);
         register(r, LibEntityNames.EGOMINION, EGOMINION);
         register(r, LibEntityNames.EGOLANDMINE, EGOLANDMINE);
+        register(r, LibEntityNames.EGOBEAM, EGOBEAM);
 
+        register(r, LibEntityNames.HERRSCHER, HERRSCHER);
+
+        register(r, LibItemNames.JUDAHOATH, JUDAHOATH);
         register(r, LibEntityNames.AURAFIRE, AURAFIRE);
         register(r, LibEntityNames.INFLUXWAVER_PROJECTILE, INFLUXWAVER);
         register(r, LibEntityNames.TRUETERRABLADE_PROJECTILE,TRUETERRABLADE);
         register(r, LibEntityNames.TRUESHADOWKATANA_PROJECTILE, TRUESHADOWKATANA);
+        register(r, LibEntityNames.BUTTERFLY_PROJECTILE, BUTTERFLY);
     }
 
     public static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, ResourceLocation name, IForgeRegistryEntry<V> thing) {

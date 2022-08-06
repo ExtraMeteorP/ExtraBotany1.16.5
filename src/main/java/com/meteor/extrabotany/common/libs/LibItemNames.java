@@ -9,6 +9,7 @@ public class LibItemNames {
     public static final String FLAMESCIONWEAPON = "flamescionweapon";
 
     public static final String WALKINGCANE = "walkingcane";
+    public static final String MANAREADER = "manareader";
     
     public static final String MANADRIVERRING = "manadrivering";
     public static final String FROSTSTAR = "froststar";
@@ -26,9 +27,21 @@ public class LibItemNames {
     public static final String POWERGLOVE = "powerglove";
     public static final String MOTORACCESSORY = "motoraccessory";
     public static final String COSMICCARKEYACCESSORY = "cosmiccarkeyaccessory";
+    public static final String SUNRING = "sunring";
+    public static final String MOONPENDANT = "moonpendant";
+    public static final String POTATOCHIPS = "potatochips";
+
+    public static final String RECORDEGO = "recordego";
+    public static final String RECORDHERRSCHER = "recordherrscher";
 
     public static final String SHADOWKATANA = "shadowkatana";
+    public static final String RODOFDISCORD = "rodofdiscord";
 
+    public static final String JUDAHOATH = "judahoath";
+    public static final String JUDAHOATHSAKURA = "judahoathsakura";
+    public static final String JUDAHOATHKIRA = "judahoathkira";
+
+    public static final String UUZFAN = "uuzfan";
     public static final String TRUETERRABLADE = "trueterrablade";
     public static final String TRUESHADOWKATANA = "trueshadowkatana";
     public static final String INFLUXWAVER = "influxwaver";
@@ -42,12 +55,14 @@ public class LibItemNames {
     public static final String ACHILLEDSHIELD = "achilledshield";
     public static final String BUDDHISTRELICS = "buddhistrelics";
     public static final String CAMERA = "camera";
+    public static final String SPEARSUBSPACE = "spearsubspace";
 
     public static final String SPIRITFUEL = "spiritfuel";
     public static final String NIGHTMAREFUEL = "nightmarefuel";
     public static final String GILDEDMASHEDPOTATO = "gildedmashedpotato";
     public static final String FRIEDCHICKEN = "friedchicken";
     public static final String MANADRINK = "manadrink";
+    public static final String FRIGGAAPPLE = "friggaapple";
 
     public static final String BREW_SPLASHGRENADE = "splashgrenade";
     public static final String BREW_COCKTAIL = "cocktail";
@@ -121,5 +136,7 @@ public class LibItemNames {
     public static final String REWARDBAGB = "rewardbagb";
     public static final String REWARDBAGC = "rewardbagc";
     public static final String REWARDBAGD = "rewardbagd";
+    public static final String REWARDBAGLIMITIEDEDITION = "rewardbaglimitededition";
+    public static final String REWARDBAG943 = "rewardbag943";
 
 }

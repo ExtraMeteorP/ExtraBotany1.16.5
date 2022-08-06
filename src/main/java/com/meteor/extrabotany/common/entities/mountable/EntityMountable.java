@@ -2,7 +2,6 @@ package com.meteor.extrabotany.common.entities.mountable;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.BoatEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -12,12 +11,16 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.UUID;
+
 public abstract class EntityMountable extends BoatEntity {
 
     private static final String TAG_PITCH = "pitch";
     private static final String TAG_ROTATION = "rotation";
     private static final String TAG_MOUNTABLE = "mountable";
-    private static final String TAG_DRIVERID = "driverid";
+    private static final String TAG_OWNERUUID = "owneruuid";
 
     private static final DataParameter<Float> PITCH = EntityDataManager.createKey(EntityMountable.class,
             DataSerializers.FLOAT);
@@ -25,8 +28,8 @@ public abstract class EntityMountable extends BoatEntity {
             DataSerializers.FLOAT);
     private static final DataParameter<Boolean> MOUNTABLE = EntityDataManager.createKey(EntityMountable.class,
             DataSerializers.BOOLEAN);
-    private static final DataParameter<Integer> DRIVERID = EntityDataManager.createKey(EntityMountable.class,
-            DataSerializers.VARINT);
+    private static final DataParameter<Optional<UUID>> OWNER_UUID = EntityDataManager.createKey(EntityMountable.class,
+            DataSerializers.OPTIONAL_UNIQUE_ID);
 
     public boolean ctrlInputDown = false;
     public boolean spaceInputDown = false;
@@ -41,7 +44,7 @@ public abstract class EntityMountable extends BoatEntity {
         if(ticksExisted <= 3)
             return;
         if(getMountable()){
-            if(this.getPassengers().isEmpty() || !this.getPassengers().isEmpty() && !(this.getPassengers().get(0) instanceof PlayerEntity)){
+            if(this.getPassengers().isEmpty() || !this.getPassengers().isEmpty() && !(this.getPassengers().get(0).getUniqueID().equals(getOwnerId()))){
                 remove();
                 return;
             }
@@ -70,6 +73,7 @@ public abstract class EntityMountable extends BoatEntity {
         this.dataManager.register(ROTATION, 0F);
         this.dataManager.register(PITCH, 0F);
         this.dataManager.register(MOUNTABLE,false);
+        this.dataManager.register(OWNER_UUID, Optional.empty());
     }
 
     @Override
@@ -96,6 +100,7 @@ public abstract class EntityMountable extends BoatEntity {
         setRotation(compound.getFloat(TAG_ROTATION));
         setPitch(compound.getFloat(TAG_PITCH));
         setMountable(compound.getBoolean(TAG_MOUNTABLE));
+        setOwnerId(compound.getUniqueId(TAG_OWNERUUID));
     }
 
     @Override
@@ -104,6 +109,18 @@ public abstract class EntityMountable extends BoatEntity {
         compound.putFloat(TAG_ROTATION, getRotation());
         compound.putFloat(TAG_PITCH, getPitch());
         compound.putBoolean(TAG_MOUNTABLE, getMountable());
+        if (this.getOwnerId() != null) {
+            compound.putUniqueId(TAG_OWNERUUID, this.getOwnerId());
+        }
+    }
+
+    @Nullable
+    public UUID getOwnerId() {
+        return this.dataManager.get(OWNER_UUID).orElse((UUID)null);
+    }
+
+    public void setOwnerId(@Nullable UUID p_184754_1_) {
+        this.dataManager.set(OWNER_UUID, Optional.ofNullable(p_184754_1_));
     }
 
     public void setMountable(boolean b){

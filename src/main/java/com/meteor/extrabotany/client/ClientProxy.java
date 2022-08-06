@@ -4,8 +4,10 @@ import com.meteor.extrabotany.ExtraBotany;
 import com.meteor.extrabotany.client.handler.*;
 import com.meteor.extrabotany.client.renderer.entity.*;
 import com.meteor.extrabotany.common.blocks.ModBlocks;
+import com.meteor.extrabotany.common.handler.ContributorListHandler;
 import com.meteor.extrabotany.common.core.IProxy;
 import com.meteor.extrabotany.common.entities.ModEntities;
+import com.meteor.extrabotany.common.handler.MemeHandler;
 import com.meteor.extrabotany.common.items.brew.ItemBrewBase;
 import com.meteor.extrabotany.common.libs.LibMisc;
 import net.minecraft.block.FlowerBlock;
@@ -16,19 +18,24 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.SpriteRenderer;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.lwjgl.glfw.GLFW;
 import vazkii.botania.common.block.decor.BlockFloatingFlower;
 import vazkii.botania.common.block.decor.BlockModMushroom;
 
@@ -37,6 +44,10 @@ import java.util.Map;
 import static com.meteor.extrabotany.common.items.ModItems.*;
 
 public class ClientProxy implements IProxy {
+
+    public static KeyBinding MOUNT_SUMMON;
+    public static KeyBinding UFO_CATCH;
+    public static KeyBinding BUDDHIST_SHIFT;
 
     public void registerModels(ModelRegistryEvent evt) {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.MOTOR, RenderMotor::new);
@@ -53,12 +64,16 @@ public class ClientProxy implements IProxy {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGO, RenderEGO::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGOMINION, RenderEGO::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGOLANDMINE, RenderEGOLandmine::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.EGOBEAM, RenderEGOBeam::new);
+
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.HERRSCHER, RenderHerrscher::new);
 
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.MAGICARROW, RenderDummy::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.AURAFIRE, RenderDummy::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.INFLUXWAVER, RenderProjectileBase::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.TRUETERRABLADE, RenderProjectileBase::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.TRUESHADOWKATANA, RenderProjectileBase::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.BUTTERFLY, RenderButterflyProjectile::new);
 
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.SPLASHGRENADE, renderManager -> new SpriteRenderer<>(renderManager, Minecraft.getInstance().getItemRenderer()));
     }
@@ -72,7 +87,6 @@ public class ClientProxy implements IProxy {
         ExtraBotany.keyRight = gameSettings.keyBindRight;
         ExtraBotany.keyUp = gameSettings.keyBindJump;
         ExtraBotany.keyFlight = gameSettings.keyBindSprint;
-
         registerRenderTypes();
         event.enqueueWork(ClientProxy::registerPropertyGetters);
     }
@@ -90,6 +104,15 @@ public class ClientProxy implements IProxy {
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         forgeBus.addListener(HUDHandler::onOverlayRender);
         forgeBus.addListener(ClientTickHandler::clientTickEnd);
+
+        MOUNT_SUMMON = new KeyBinding("key.extrabotany_mount_summon", KeyConflictContext.GUI, InputMappings.getInputByCode(GLFW.GLFW_KEY_R, 0), LibMisc.MOD_ID);
+        ClientRegistry.registerKeyBinding(ClientProxy.MOUNT_SUMMON);
+
+        UFO_CATCH = new KeyBinding("key.extrabotany_ufo_catch", KeyConflictContext.GUI, InputMappings.getInputByCode(GLFW.GLFW_KEY_R, 0), LibMisc.MOD_ID);
+        ClientRegistry.registerKeyBinding(ClientProxy.UFO_CATCH);
+
+        BUDDHIST_SHIFT = new KeyBinding("key.extrabotany_buddhist_shift", KeyConflictContext.GUI, InputMappings.getInputByCode(GLFW.GLFW_KEY_LEFT_CONTROL, 0), LibMisc.MOD_ID);
+        ClientRegistry.registerKeyBinding(ClientProxy.BUDDHIST_SHIFT);
     }
 
     private static void registerRenderTypes() {
@@ -107,6 +130,7 @@ public class ClientProxy implements IProxy {
         DeferredWorkQueue.runLater(() -> {
             initAuxiliaryRender();
             ColorHandler.init();
+            MemeHandler.spam();
         });
     }
 

@@ -41,6 +41,7 @@ public final class ExtraBotanyGroup extends ItemGroup {
     public void fill(NonNullList<ItemStack> list) {
         this.list = list;
         addFlower(annoyingflower, annoyingflowerFloating);
+        addFlower(serenitian, serenitianFloating);
         addFlower(bellflower, bellflowerFloating);
         addFlower(edelweiss, edelweissFloating);
         addFlower(geminiorchid, geminiorchidFloating);
@@ -52,6 +53,10 @@ public final class ExtraBotanyGroup extends ItemGroup {
 
         addBlock(powerframe);
         addBlock(manabuffer);
+        addBlock(dimensioncatalyst);
+
+        addItem(recordego);
+        addItem(recordherrscher);
 
         addItem(lensmana);
         addItem(lenspotion);
@@ -68,6 +73,7 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(shadowium);
         addItem(photonium);
         addItem(aerialite);
+        addItem(goldcloth);
         addItem(orichalcos);
         addItem(heromedal);
         addItem(universalpetal);
@@ -90,9 +96,15 @@ public final class ExtraBotanyGroup extends ItemGroup {
         addItem(manadrivering);
         addItem(natureorb);
         addItem(jingweifeather);
+        addItem(potatochips);
+        addItem(sunring);
+        addItem(moonpendant);
 
+        addItem(manareader);
         addItem(walkingcane);
         addItem(shadowkatana);
+        addItem(silverbullet);
+        addItem(rodofdiscord);
         addItem(influxwaver);
         addItem(starwrath);
         addItem(trueshadowkatana);
